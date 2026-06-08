@@ -151,6 +151,57 @@ export interface Invoice {
   createdAt: string;
 }
 
+export interface GuestUser {
+  id: string;
+  email: string;
+  passwordHash: string;
+  name: string;
+  phone: string;
+  loyaltyPoints: number;
+  vipStatus: "STANDARD" | "SILVER" | "GOLD" | "PLATINUM";
+  preferences: string[];
+  createdAt: string;
+}
+
+export interface ConciergeRequest {
+  id: string;
+  bookingId: string;
+  guestName: string;
+  roomNumber: string;
+  requestType: "Towels" | "Cleaning" | "WakeUp" | "Airport" | "Tour" | "Dining";
+  details: string;
+  status: "PENDING" | "COMPLETED" | "CANCELLED";
+  createdAt: string;
+}
+
+export interface StayReview {
+  id: string;
+  bookingId: string;
+  guestName: string;
+  rating: number;
+  comment: string;
+  photos: string[];
+  isFeatured: boolean;
+  isApproved: boolean;
+  createdAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: "guest" | "admin";
+  message: string;
+  timestamp: string;
+}
+
+export interface ChatSession {
+  id: string;
+  bookingId: string;
+  guestName: string;
+  messages: ChatMessage[];
+  status: "active" | "archived";
+  updatedAt: string;
+}
+
 const enterpriseDbPath = path.join(process.cwd(), "db_enterprise.json");
 
 // Default initial data for simulation database
@@ -247,6 +298,57 @@ const defaultEnterpriseData = {
       createdAt: new Date().toISOString()
     }
   ] as Invoice[],
+  users: [
+    {
+      id: "USR-9081",
+      email: "arjun@example.com",
+      passwordHash: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", // 'password'
+      name: "Arjun Mehta",
+      phone: "+91 98765 43210",
+      loyaltyPoints: 350,
+      vipStatus: "GOLD" as const,
+      preferences: ["High floor", "Vegan cuisine"],
+      createdAt: new Date().toISOString()
+    }
+  ] as GuestUser[],
+  concierge_requests: [
+    {
+      id: "CR-001",
+      bookingId: "BK-8724-X90A",
+      guestName: "Arjun Mehta",
+      roomNumber: "Cottage 101",
+      requestType: "Towels" as const,
+      details: "Please bring 2 extra pool towels to Cottage 101.",
+      status: "PENDING" as const,
+      createdAt: new Date().toISOString()
+    }
+  ] as ConciergeRequest[],
+  reviews: [
+    {
+      id: "RV-001",
+      bookingId: "BK-8724-X90A",
+      guestName: "Arjun Mehta",
+      rating: 5,
+      comment: "Absolutely magical stay. The views of the misty pine forests are breath-taking. The outdoor rainforest shower was a true highlight!",
+      photos: ["/images/gal-1.jpg", "/images/gal-3.jpg"],
+      isFeatured: true,
+      isApproved: true,
+      createdAt: new Date().toISOString()
+    }
+  ] as StayReview[],
+  chats: [
+    {
+      id: "CH-8724-X90A",
+      bookingId: "BK-8724-X90A",
+      guestName: "Arjun Mehta",
+      messages: [
+        { id: "m1", sender: "guest" as const, message: "Hi, what time is the sunset yoga tomorrow?", timestamp: new Date().toISOString() },
+        { id: "m2", sender: "admin" as const, message: "Namaste Arjun! The yoga session starts at 5:30 PM on the outdoor wooden deck.", timestamp: new Date().toISOString() }
+      ],
+      status: "active" as const,
+      updatedAt: new Date().toISOString()
+    }
+  ] as ChatSession[],
   housekeeping: [
     {
       id: "HK-101",
@@ -476,6 +578,22 @@ const readEnterpriseDb = () => {
     }
     if (!data.invoices) {
       data.invoices = defaultEnterpriseData.invoices;
+      updated = true;
+    }
+    if (!data.users) {
+      data.users = defaultEnterpriseData.users;
+      updated = true;
+    }
+    if (!data.concierge_requests) {
+      data.concierge_requests = defaultEnterpriseData.concierge_requests;
+      updated = true;
+    }
+    if (!data.reviews) {
+      data.reviews = defaultEnterpriseData.reviews;
+      updated = true;
+    }
+    if (!data.chats) {
+      data.chats = defaultEnterpriseData.chats;
       updated = true;
     }
     if (updated) {
@@ -751,6 +869,112 @@ export const createInvoice = (invoice: Omit<Invoice, "id" | "createdAt">) => {
   db.invoices.push(newInvoice);
   writeEnterpriseDb(db);
   return newInvoice;
+};
+
+// Users Operations
+export const getUsers = (): GuestUser[] => readEnterpriseDb().users || [];
+export const createUser = (user: Omit<GuestUser, "id" | "createdAt" | "loyaltyPoints" | "vipStatus">) => {
+  const db = readEnterpriseDb();
+  const newUser: GuestUser = {
+    ...user,
+    id: `USR-8724-${cryptoRandomHex(2)}`,
+    loyaltyPoints: 0,
+    vipStatus: "STANDARD",
+    createdAt: new Date().toISOString()
+  };
+  db.users = db.users || [];
+  db.users.push(newUser);
+  writeEnterpriseDb(db);
+  return newUser;
+};
+export const updateUser = (id: string, data: Partial<GuestUser>) => {
+  const db = readEnterpriseDb();
+  db.users = (db.users || []).map((u: GuestUser) =>
+    u.id === id ? { ...u, ...data } : u
+  );
+  writeEnterpriseDb(db);
+  return db.users.find((u: GuestUser) => u.id === id);
+};
+
+// Concierge Operations
+export const getConciergeRequests = (): ConciergeRequest[] => readEnterpriseDb().concierge_requests || [];
+export const createConciergeRequest = (req: Omit<ConciergeRequest, "id" | "createdAt" | "status">) => {
+  const db = readEnterpriseDb();
+  const newReq: ConciergeRequest = {
+    ...req,
+    id: `CR-8724-${cryptoRandomHex(2)}`,
+    status: "PENDING",
+    createdAt: new Date().toISOString()
+  };
+  db.concierge_requests = db.concierge_requests || [];
+  db.concierge_requests.push(newReq);
+  writeEnterpriseDb(db);
+  return newReq;
+};
+export const updateConciergeRequest = (id: string, status: ConciergeRequest["status"]) => {
+  const db = readEnterpriseDb();
+  db.concierge_requests = (db.concierge_requests || []).map((r: ConciergeRequest) =>
+    r.id === id ? { ...r, status } : r
+  );
+  writeEnterpriseDb(db);
+  return db.concierge_requests.find((r: ConciergeRequest) => r.id === id);
+};
+
+// Reviews Operations
+export const getReviews = (): StayReview[] => readEnterpriseDb().reviews || [];
+export const createReview = (review: Omit<StayReview, "id" | "createdAt" | "isFeatured" | "isApproved">) => {
+  const db = readEnterpriseDb();
+  const newReview: StayReview = {
+    ...review,
+    id: `RV-8724-${cryptoRandomHex(2)}`,
+    isFeatured: false,
+    isApproved: false,
+    createdAt: new Date().toISOString()
+  };
+  db.reviews = db.reviews || [];
+  db.reviews.push(newReview);
+  writeEnterpriseDb(db);
+  return newReview;
+};
+export const moderateReview = (id: string, isApproved: boolean, isFeatured: boolean) => {
+  const db = readEnterpriseDb();
+  db.reviews = (db.reviews || []).map((r: StayReview) =>
+    r.id === id ? { ...r, isApproved, isFeatured } : r
+  );
+  writeEnterpriseDb(db);
+  return db.reviews.find((r: StayReview) => r.id === id);
+};
+
+// Live Chat Support Operations
+export const getChats = (): ChatSession[] => readEnterpriseDb().chats || [];
+export const addChatMessage = (bookingId: string, guestName: string, sender: "guest" | "admin", message: string) => {
+  const db = readEnterpriseDb();
+  db.chats = db.chats || [];
+  let session = db.chats.find((c: ChatSession) => c.bookingId === bookingId);
+  if (!session) {
+    session = {
+      id: `CH-8724-${bookingId.split("-")[2] || cryptoRandomHex(2)}`,
+      bookingId,
+      guestName,
+      messages: [],
+      status: "active",
+      updatedAt: new Date().toISOString()
+    };
+    db.chats.push(session);
+  }
+  const newMsg: ChatMessage = {
+    id: `MSG-${cryptoRandomHex(3)}`,
+    sender,
+    message,
+    timestamp: new Date().toISOString()
+  };
+  session.messages.push(newMsg);
+  session.status = "active";
+  session.updatedAt = new Date().toISOString();
+  
+  db.chats = db.chats.map((c: ChatSession) => c.bookingId === bookingId ? session! : c);
+  writeEnterpriseDb(db);
+  return session;
 };
 
 // Small helper for random suffix

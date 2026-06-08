@@ -9,7 +9,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     if (req.method === "GET") {
+      const { bookingId } = req.query;
       const orders = getRestaurantOrders();
+      if (bookingId) {
+        const filtered = orders.filter((o) => o.bookingId === String(bookingId));
+        return res.status(200).json({ success: true, orders: filtered });
+      }
       return res.status(200).json({ success: true, orders });
     }
 

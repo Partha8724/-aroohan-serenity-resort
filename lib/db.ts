@@ -15,6 +15,10 @@ export interface Booking {
   totalPrice: number;
   status: "PENDING" | "CONFIRMED" | "CANCELLED";
   createdAt: string;
+  checkedInOnline?: boolean;
+  arrivalTime?: string;
+  idDocument?: string;
+  qrPass?: string;
 }
 
 const dbFilePath = path.join(process.cwd(), "db.json");

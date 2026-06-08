@@ -124,6 +124,14 @@ export default function AdminDashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [coupons, setCoupons] = useState<any[]>([]);
 
+  // NEW Operational States
+  const [conciergeRequests, setConciergeRequests] = useState<any[]>([]);
+  const [allReviews, setAllReviews] = useState<any[]>([]);
+  const [chatSessions, setChatSessions] = useState<any[]>([]);
+  const [selectedChatSession, setSelectedChatSession] = useState<any | null>(null);
+  const [adminChatInput, setAdminChatInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
   // Action status indicators
   const [isSyncing, setIsSyncing] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -155,6 +163,38 @@ export default function AdminDashboard() {
     validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     isActive: true,
   });
+
+  // Chat Polling for Support Chat panel
+  useEffect(() => {
+    if (activeTab !== "chat" || !isAdmin) return;
+
+    const fetchChats = async () => {
+      try {
+        const headers = { Authorization: `Bearer ${adminKey}` };
+        const res = await fetch("/api/chat/message", { headers });
+        const data = await res.json();
+        if (data.success && data.sessions) {
+          setChatSessions(data.sessions);
+          if (selectedChatSession) {
+            const updated = data.sessions.find((s: any) => s.bookingId === selectedChatSession.bookingId);
+            if (updated) setSelectedChatSession(updated);
+          }
+        }
+      } catch (err) {
+        console.error("Admin chat polling error", err);
+      }
+    };
+
+    fetchChats();
+    const interval = setInterval(fetchChats, 4000);
+    return () => clearInterval(interval);
+  }, [activeTab, selectedChatSession, isAdmin, adminKey]);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedChatSession]);
 
   const handleRoomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -304,7 +344,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Authenticate Admin client-side and fetch records
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -332,7 +371,6 @@ export default function AdminDashboard() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
 
-        // Save session credentials
         localStorage.setItem("aroohan_admin_token", data.token);
         setIsAdmin(true);
         loadDashboardData(data.token);
@@ -342,12 +380,10 @@ export default function AdminDashboard() {
     }
   };
 
-  // Load all subsystems databases
   const loadDashboardData = async (token: string) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Parallel fetching for high performance
       const [
         bookingsRes,
         pmsMetricsRes,
@@ -357,6 +393,9 @@ export default function AdminDashboard() {
         channelRes,
         roomsRes,
         couponsRes,
+        conciergeRes,
+        reviewsRes,
+        chatsRes,
       ] = await Promise.all([
         fetch("/api/bookings/list", { headers }),
         fetch("/api/admin/metrics", { headers }),
@@ -366,6 +405,9 @@ export default function AdminDashboard() {
         fetch("/api/channel", { headers }),
         fetch("/api/admin/rooms", { headers }),
         fetch("/api/admin/coupons", { headers }),
+        fetch("/api/concierge/request", { headers }),
+        fetch("/api/admin/reviews", { headers }),
+        fetch("/api/chat/message", { headers }),
       ]);
 
       const bookingsData = await bookingsRes.json();
@@ -376,6 +418,9 @@ export default function AdminDashboard() {
       const channelData = await channelRes.json();
       const roomsData = await roomsRes.json();
       const couponsData = await couponsRes.json();
+      const conciergeData = await conciergeRes.json();
+      const reviewsData = await reviewsRes.json();
+      const chatsData = await chatsRes.json();
 
       if (bookingsData.success) setBookings(bookingsData.bookings);
       if (metricsData.success) {
@@ -389,20 +434,10 @@ export default function AdminDashboard() {
       if (channelData.success) setChannels(channelData.channels);
       if (roomsData.success) setRooms(roomsData.rooms);
       if (couponsData.success) setCoupons(couponsData.coupons);
+      if (conciergeData.success) setConciergeRequests(conciergeData.requests);
+      if (reviewsData.success) setAllReviews(reviewsData.reviews);
+      if (chatsData.success) setChatSessions(chatsData.sessions || []);
 
-      // Fetch enterprise local states
-      const enterpriseRes = await fetch("/api/admin/metrics", { headers });
-      const entData = await enterpriseRes.json();
-
-      // Read secondary simulated properties
-      const localEntRes = await fetch("/api/restaurant"); // triggers get from enterprise local db file
-      const localEntData = await localEntRes.json();
-      
-      // Load PMS items
-      const pmsRes = await fetch("/api/admin/metrics", { headers });
-      const pmsData = await pmsRes.json();
-
-      // Set Mock Housekeeping & CRM
       setHousekeeping([
         { id: "HK-1", roomNumber: "Cottage 101", cleanerName: "Ramesh Kumar", status: "COMPLETED", notes: "Vacuumed, cedar scents.", assignedAt: new Date().toISOString() },
         { id: "HK-2", roomNumber: "Cottage 102", cleanerName: "Priya Sharma", status: "PENDING", notes: "Change linens.", assignedAt: new Date().toISOString() }
@@ -423,7 +458,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Check persisted admin key on mount
   useEffect(() => {
     const token = localStorage.getItem("aroohan_admin_token");
     if (token === "AroohanAdmin8724") {
@@ -441,20 +475,16 @@ export default function AdminDashboard() {
     setTwoFactorCode("");
   };
 
-  // Trigger OTA Channel Synchronization
   const handleChannelSync = async () => {
     setIsSyncing(true);
     try {
       const res = await fetch("/api/channel", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${adminKey}`,
-        },
+        headers: { Authorization: `Bearer ${adminKey}` },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Refresh sync logs
       const updatedRes = await fetch("/api/channel", {
         headers: { Authorization: `Bearer ${adminKey}` },
       });
@@ -469,7 +499,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Export Bookings Database to CSV file
   const handleExportCSV = () => {
     if (bookings.length === 0) return;
     const headers = ["Booking ID", "Guest Name", "Email", "Phone", "Room Selection", "Check In", "Check Out", "Total Paid", "Status"];
@@ -497,7 +526,6 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  // Update Booking Status
   const handleBookingStatusChange = async (bookingId: string, newStatus: string) => {
     setIsUpdating(bookingId);
     try {
@@ -522,7 +550,121 @@ export default function AdminDashboard() {
     }
   };
 
-  // jsPDF Document Downloader
+  // Operational status triggers (NEW)
+  const handleUpdateConciergeStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch("/api/concierge/request", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminKey}`
+        },
+        body: JSON.stringify({ id, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setConciergeRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+      } else {
+        alert(data.error);
+      }
+    } catch (e) {
+      alert("Failed to update concierge request.");
+    }
+  };
+
+  const handleUpdateRestaurantStatus = async (orderId: string, status: string) => {
+    try {
+      const res = await fetch("/api/restaurant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminKey}`
+        },
+        body: JSON.stringify({ action: "update_status", orderId, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRestaurantOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+      } else {
+        alert(data.error);
+      }
+    } catch (e) {
+      alert("Failed to update restaurant status.");
+    }
+  };
+
+  const handleUpdateSpaStatus = async (spaBookingId: string, status: string) => {
+    try {
+      const res = await fetch("/api/spa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminKey}`
+        },
+        body: JSON.stringify({ action: "update_status", spaBookingId, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSpaBookings(prev => prev.map(s => s.id === spaBookingId ? { ...s, status } : s));
+      } else {
+        alert(data.error);
+      }
+    } catch (e) {
+      alert("Failed to update spa booking status.");
+    }
+  };
+
+  const handleModerateReview = async (id: string, isApproved: boolean, isFeatured: boolean) => {
+    try {
+      const res = await fetch("/api/admin/reviews", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminKey}`
+        },
+        body: JSON.stringify({ id, isApproved, isFeatured })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAllReviews(prev => prev.map(r => r.id === id ? { ...r, isApproved, isFeatured } : r));
+      } else {
+        alert(data.error);
+      }
+    } catch (e) {
+      alert("Failed to moderate review.");
+    }
+  };
+
+  const handleSendAdminReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedChatSession || !adminChatInput.trim()) return;
+
+    try {
+      const res = await fetch("/api/chat/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminKey}`
+        },
+        body: JSON.stringify({
+          bookingId: selectedChatSession.bookingId,
+          guestName: selectedChatSession.guestName,
+          sender: "admin",
+          message: adminChatInput
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAdminChatInput("");
+        setSelectedChatSession(data.session);
+        setChatSessions(prev => prev.map(s => s.bookingId === selectedChatSession.bookingId ? data.session : s));
+      }
+    } catch (e) {
+      console.error("Failed to send admin reply", e);
+    }
+  };
+
+  // jsPDF Document Downloader (preserving exact look)
   const handleDownloadInvoice = async (booking: Booking) => {
     try {
       const jspdfModule: any = await new Promise((resolve) => {
@@ -607,7 +749,7 @@ export default function AdminDashboard() {
           minHeight: "100vh",
           background: "radial-gradient(circle at center, #112620 0%, #0d0d0d 100%)",
           color: "#f5f0e1",
-          fontFamily: "var(--font-family)",
+          fontFamily: "var(--font-family, sans-serif)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -670,7 +812,7 @@ export default function AdminDashboard() {
               <button
                 type="submit"
                 className="button"
-                style={{ width: "100%", padding: "0.9rem", borderRadius: "50px", backgroundColor: "#b89b72", color: "#111", fontWeight: 600, letterSpacing: "2px", textTransform: "uppercase", fontSize: "0.75rem" }}
+                style={{ width: "100%", padding: "0.9rem", borderRadius: "50px", backgroundColor: "#b89b72", color: "#111", fontWeight: 600, letterSpacing: "2px", textTransform: "uppercase", fontSize: "0.75rem", border: "none", cursor: "pointer" }}
               >
                 {loginStep === 1 ? "Verify Credentials" : "Authorize Session"}
               </button>
@@ -692,6 +834,9 @@ export default function AdminDashboard() {
                 { id: "rooms", label: "Manage Rooms" },
                 { id: "bookings", label: "Reservations" },
                 { id: "restaurant", label: "Dining & Wellness" },
+                { id: "concierge", label: "Digital Concierge" },
+                { id: "reviews", label: "Review Moderation" },
+                { id: "chat", label: "Support Chat" },
                 { id: "transport", label: "Logistics & Events" },
                 { id: "channels", label: "Channel Manager" },
                 { id: "coupons", label: "Manage Coupons" },
@@ -863,7 +1008,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div style={{ gridColumn: "span 2", display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
-                        <button type="submit" className="button" style={{ padding: "0.6rem 1.8rem", borderRadius: "50px", fontSize: "0.75rem", backgroundColor: "#b89b72", color: "#111", fontWeight: 600 }}>
+                        <button type="submit" className="button" style={{ padding: "0.6rem 1.8rem", borderRadius: "50px", fontSize: "0.75rem", backgroundColor: "#b89b72", color: "#111", fontWeight: 600, border: "none", cursor: "pointer" }}>
                           {editingRoomId ? "Update Suite" : "Add Suite Type"}
                         </button>
                         {editingRoomId && (
@@ -1020,7 +1165,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div style={{ gridColumn: "span 4", display: "flex", justifyContent: "flex-end", marginTop: "0.5rem" }}>
-                        <button type="submit" className="button" style={{ padding: "0.6rem 1.8rem", borderRadius: "50px", fontSize: "0.75rem", backgroundColor: "#b89b72", color: "#111", fontWeight: 600 }}>
+                        <button type="submit" className="button" style={{ padding: "0.6rem 1.8rem", borderRadius: "50px", fontSize: "0.75rem", backgroundColor: "#b89b72", color: "#111", fontWeight: 600, border: "none", cursor: "pointer" }}>
                           Generate Coupon
                         </button>
                       </div>
@@ -1141,7 +1286,7 @@ export default function AdminDashboard() {
                     <button
                       onClick={handleExportCSV}
                       className="button"
-                      style={{ padding: "0.6rem 1.4rem", borderRadius: "50px", fontSize: "0.75rem", letterSpacing: "1px" }}
+                      style={{ padding: "0.6rem 1.4rem", borderRadius: "50px", fontSize: "0.75rem", letterSpacing: "1px", border: "none", cursor: "pointer" }}
                     >
                       Export Database CSV
                     </button>
@@ -1176,7 +1321,7 @@ export default function AdminDashboard() {
                               <select
                                 value={booking.status}
                                 onChange={(e) => handleBookingStatusChange(booking.id, e.target.value)}
-                                style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", color: booking.status === "CONFIRMED" ? "#b89b72" : "#ffbaba", padding: "0.3rem 0.6rem", fontSize: "0.75rem", outline: "none", cursor: "pointer" }}
+                                style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", color: booking.status === "CONFIRMED" ? "#10B981" : booking.status === "PENDING" ? "#F59E0B" : "#ffbaba", padding: "0.3rem 0.6rem", fontSize: "0.75rem", outline: "none", cursor: "pointer" }}
                               >
                                 <option value="PENDING">PENDING</option>
                                 <option value="CONFIRMED">CONFIRMED</option>
@@ -1211,12 +1356,12 @@ export default function AdminDashboard() {
                   <div className="glass" style={{ padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)", marginBottom: "3rem" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Order ID</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Table/Room</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Cuisine Items</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Total Bill</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Status</th>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: "#b89b72" }}>
+                          <th style={{ padding: "0.8rem" }}>Order ID</th>
+                          <th style={{ padding: "0.8rem" }}>Table/Room</th>
+                          <th style={{ padding: "0.8rem" }}>Cuisine Items</th>
+                          <th style={{ padding: "0.8rem" }}>Total Bill</th>
+                          <th style={{ padding: "0.8rem" }}>Status Control</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1229,7 +1374,17 @@ export default function AdminDashboard() {
                             </td>
                             <td style={{ padding: "1rem 0.8rem", color: "#b89b72", fontWeight: 600 }}>${ord.totalPrice}</td>
                             <td style={{ padding: "1rem 0.8rem" }}>
-                              <span style={{ color: "#e1caa0" }}>{ord.status}</span>
+                              <select
+                                value={ord.status}
+                                onChange={(e) => handleUpdateRestaurantStatus(ord.id, e.target.value as any)}
+                                style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px", color: "#f5f0e1", padding: "4px", fontSize: "0.75rem", cursor: "pointer" }}
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="PREPARING">PREPARING</option>
+                                <option value="READY">READY</option>
+                                <option value="DELIVERED">DELIVERED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                              </select>
                             </td>
                           </tr>
                         ))}
@@ -1242,12 +1397,13 @@ export default function AdminDashboard() {
                   <div className="glass" style={{ padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Spa Code</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Guest</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Therapy Package</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Therapist</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Scheduled Date/Time</th>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: "#b89b72" }}>
+                          <th style={{ padding: "0.8rem" }}>Spa Code</th>
+                          <th style={{ padding: "0.8rem" }}>Guest</th>
+                          <th style={{ padding: "0.8rem" }}>Therapy Package</th>
+                          <th style={{ padding: "0.8rem" }}>Therapist</th>
+                          <th style={{ padding: "0.8rem" }}>Scheduled Date/Time</th>
+                          <th style={{ padding: "0.8rem" }}>Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1258,10 +1414,220 @@ export default function AdminDashboard() {
                             <td style={{ padding: "1rem 0.8rem" }}>{spa.therapyName}</td>
                             <td style={{ padding: "1rem 0.8rem" }}>{spa.therapist}</td>
                             <td style={{ padding: "1rem 0.8rem" }}>{new Date(spa.scheduledAt).toLocaleString()}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>
+                              <select
+                                value={spa.status}
+                                onChange={(e) => handleUpdateSpaStatus(spa.id, e.target.value as any)}
+                                style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px", color: "#f5f0e1", padding: "4px", fontSize: "0.75rem", cursor: "pointer" }}
+                              >
+                                <option value="SCHEDULED">SCHEDULED</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                              </select>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              )}
+
+              {/* NEW TAB: DIGITAL CONCIERGE */}
+              {activeTab === "concierge" && (
+                <div>
+                  <h2 style={{ fontSize: "1.8rem", fontWeight: 300, marginBottom: "1.5rem" }}>Digital Concierge Requests</h2>
+                  <p style={{ fontSize: "0.85rem", color: "rgba(245,240,225,0.6)", marginBottom: "2rem" }}>
+                    Butler and front lobby request ticket desk. Track instant guest requests for towels, cleaning, shuttle services, and wake-up calls.
+                  </p>
+
+                  <div className="glass" style={{ padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: "#b89b72" }}>
+                          <th style={{ padding: "0.8rem" }}>Request ID</th>
+                          <th style={{ padding: "0.8rem" }}>Room Number</th>
+                          <th style={{ padding: "0.8rem" }}>Guest Name</th>
+                          <th style={{ padding: "0.8rem" }}>Type</th>
+                          <th style={{ padding: "0.8rem" }}>Details</th>
+                          <th style={{ padding: "0.8rem" }}>Timestamp</th>
+                          <th style={{ padding: "0.8rem" }}>Status Control</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {conciergeRequests.map((req) => (
+                          <tr key={req.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                            <td style={{ padding: "1rem 0.8rem", fontWeight: 600 }}>{req.id}</td>
+                            <td style={{ padding: "1rem 0.8rem", fontWeight: 600 }}>{req.roomNumber}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>{req.guestName}</td>
+                            <td style={{ padding: "1rem 0.8rem", color: "#b89b72" }}>{req.requestType}</td>
+                            <td style={{ padding: "1rem 0.8rem", color: "rgba(245,240,225,0.7)" }}>{req.details}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>{new Date(req.createdAt).toLocaleString()}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>
+                              <select
+                                value={req.status}
+                                onChange={(e) => handleUpdateConciergeStatus(req.id, e.target.value as any)}
+                                style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px", color: req.status === "COMPLETED" ? "#10B981" : req.status === "PENDING" ? "#F59E0B" : "red", padding: "4px", fontSize: "0.75rem", cursor: "pointer", fontWeight: 600 }}
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                              </select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* NEW TAB: REVIEW MODERATION */}
+              {activeTab === "reviews" && (
+                <div>
+                  <h2 style={{ fontSize: "1.8rem", fontWeight: 300, marginBottom: "1.5rem" }}>Stay Reviews Moderation</h2>
+                  <p style={{ fontSize: "0.85rem", color: "rgba(245,240,225,0.6)", marginBottom: "2rem" }}>
+                    Boutique reviews moderations. Approve guest reviews to publish them publicly, or toggle featured slots.
+                  </p>
+
+                  <div className="glass" style={{ padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: "#b89b72" }}>
+                          <th style={{ padding: "0.8rem" }}>ID</th>
+                          <th style={{ padding: "0.8rem" }}>Guest Details</th>
+                          <th style={{ padding: "0.8rem" }}>Rating</th>
+                          <th style={{ padding: "0.8rem" }}>Comment Feedback</th>
+                          <th style={{ padding: "0.8rem" }}>Approved</th>
+                          <th style={{ padding: "0.8rem" }}>Featured Slot</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allReviews.map((rev) => (
+                          <tr key={rev.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                            <td style={{ padding: "1rem 0.8rem", fontWeight: 600 }}>{rev.id}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>
+                              <strong>{rev.guestName}</strong>
+                              <div style={{ fontSize: "0.7rem", color: "rgba(245,240,225,0.5)" }}>Stay: {rev.bookingId}</div>
+                            </td>
+                            <td style={{ padding: "1rem 0.8rem", color: "#F59E0B" }}>{"★".repeat(rev.rating)}</td>
+                            <td style={{ padding: "1rem 0.8rem", color: "rgba(245,240,225,0.8)" }}>{rev.comment}</td>
+                            <td style={{ padding: "1rem 0.8rem" }}>
+                              <input 
+                                type="checkbox" 
+                                checked={rev.isApproved} 
+                                onChange={(e) => handleModerateReview(rev.id, e.target.checked, rev.isFeatured)}
+                                style={{ transform: "scale(1.2)", cursor: "pointer" }}
+                              />
+                            </td>
+                            <td style={{ padding: "1rem 0.8rem" }}>
+                              <input 
+                                type="checkbox" 
+                                checked={rev.isFeatured} 
+                                onChange={(e) => handleModerateReview(rev.id, rev.isApproved, e.target.checked)}
+                                style={{ transform: "scale(1.2)", cursor: "pointer" }}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* NEW TAB: SUPPORT LIVE CHAT */}
+              {activeTab === "chat" && (
+                <div>
+                  <h2 style={{ fontSize: "1.8rem", fontWeight: 300, marginBottom: "1.5rem" }}>Sanctuary Support Live Console</h2>
+                  
+                  <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: "2rem" }} className="responsive-chat-grid">
+                    {/* Left: Session queue list */}
+                    <div className="glass" style={{ padding: "1.2rem", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "10px", maxHeight: "500px", overflowY: "auto" }}>
+                      <h4 style={{ margin: 0, fontSize: "0.9rem", color: "#b89b72", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "0.5rem" }}>Active Chats</h4>
+                      {chatSessions.length === 0 ? (
+                        <div style={{ fontSize: "0.8rem", color: "rgba(245,240,225,0.4)" }}>No active sessions</div>
+                      ) : (
+                        chatSessions.map((session) => (
+                          <div 
+                            key={session.id}
+                            onClick={() => setSelectedChatSession(session)}
+                            style={{
+                              padding: "10px",
+                              borderRadius: "6px",
+                              border: `1px solid ${selectedChatSession?.id === session.id ? "#b89b72" : "rgba(255,255,255,0.05)"}`,
+                              background: selectedChatSession?.id === session.id ? "rgba(184,155,114,0.1)" : "rgba(0,0,0,0.15)",
+                              cursor: "pointer",
+                              fontSize: "0.8rem"
+                            }}
+                          >
+                            <strong>{session.guestName}</strong>
+                            <div style={{ fontSize: "0.7rem", color: "rgba(245,240,225,0.5)" }}>Room stay: {session.bookingId}</div>
+                            <span style={{ fontSize: "0.6rem", color: "rgba(245,240,225,0.4)" }}>Updated: {new Date(session.updatedAt).toLocaleTimeString()}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    {/* Right: Messages window threads */}
+                    <div className="glass" style={{ borderRadius: "12px", display: "flex", flexDirection: "column", height: "500px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      {selectedChatSession ? (
+                        <>
+                          {/* Thread title */}
+                          <div style={{ padding: "10px 15px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", justifyContent: "space-between" }}>
+                            <strong>Chat: {selectedChatSession.guestName} (Room stay {selectedChatSession.bookingId})</strong>
+                          </div>
+                          
+                          {/* Messages list */}
+                          <div style={{ flex: 1, overflowY: "auto", padding: "1rem", display: "flex", flexDirection: "column", gap: "10px" }}>
+                            {selectedChatSession.messages.map((msg: any, idx: number) => {
+                              const isAdmin = msg.sender === "admin";
+                              return (
+                                <div 
+                                  key={idx}
+                                  style={{
+                                    alignSelf: isAdmin ? "flex-end" : "flex-start",
+                                    maxWidth: "70%",
+                                    padding: "8px 12px",
+                                    borderRadius: isAdmin ? "12px 12px 0 12px" : "12px 12px 12px 0",
+                                    background: isAdmin ? "#b89b72" : "rgba(255,255,255,0.08)",
+                                    color: isAdmin ? "#111" : "#f5f0e1",
+                                    fontSize: "0.82rem"
+                                  }}
+                                >
+                                  <div style={{ fontWeight: 600, fontSize: "0.65rem", opacity: 0.7, marginBottom: "2px" }}>
+                                    {isAdmin ? "You (Admin)" : selectedChatSession.guestName}
+                                  </div>
+                                  <div>{msg.message}</div>
+                                  <div style={{ fontSize: "0.6rem", textAlign: "right", opacity: 0.5, marginTop: "2px" }}>
+                                    {new Date(msg.timestamp).toLocaleTimeString()}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            <div ref={chatEndRef} />
+                          </div>
+
+                          {/* Message input form */}
+                          <form onSubmit={handleSendAdminReply} style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                            <input 
+                              type="text" 
+                              placeholder="Type administrative reply..."
+                              value={adminChatInput}
+                              onChange={(e) => setAdminChatInput(e.target.value)}
+                              style={{ flex: 1, background: "transparent", border: "none", color: "#f5f0e1", outline: "none", padding: "12px", fontSize: "0.85rem" }}
+                            />
+                            <button type="submit" style={{ background: "#b89b72", border: "none", color: "#111", cursor: "pointer", fontWeight: 600, textTransform: "uppercase", padding: "0 20px", fontSize: "0.75rem" }}>
+                              Reply
+                            </button>
+                          </form>
+                        </>
+                      ) : (
+                        <div style={{ margin: "auto", color: "rgba(245,240,225,0.4)", fontSize: "0.85rem" }}>
+                          Select an active support session from the queue to review history and reply.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1342,7 +1708,7 @@ export default function AdminDashboard() {
                       onClick={handleChannelSync}
                       disabled={isSyncing}
                       className="button"
-                      style={{ padding: "0.6rem 1.4rem", borderRadius: "50px", fontSize: "0.75rem", letterSpacing: "1px", backgroundColor: "#b89b72", color: "#111" }}
+                      style={{ padding: "0.6rem 1.4rem", borderRadius: "50px", fontSize: "0.75rem", letterSpacing: "1px", backgroundColor: "#b89b72", color: "#111", border: "none", cursor: "pointer" }}
                     >
                       {isSyncing ? "Synchronizing Channels..." : "Trigger Global Sync"}
                     </button>
@@ -1387,13 +1753,13 @@ export default function AdminDashboard() {
                   <div className="glass" style={{ padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem", textAlign: "left" }}>
                       <thead>
-                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Guest Profile</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Contact Details</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Identity ID</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Loyalty Points</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>VIP Member Rank</th>
-                          <th style={{ padding: "0.8rem", color: "#b89b72" }}>Preferences Logs</th>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", color: "#b89b72" }}>
+                          <th style={{ padding: "0.8rem" }}>Guest Profile</th>
+                          <th style={{ padding: "0.8rem" }}>Contact Details</th>
+                          <th style={{ padding: "0.8rem" }}>Identity ID</th>
+                          <th style={{ padding: "0.8rem" }}>Loyalty Points</th>
+                          <th style={{ padding: "0.8rem" }}>VIP Member Rank</th>
+                          <th style={{ padding: "0.8rem" }}>Preferences Logs</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1428,16 +1794,24 @@ export default function AdminDashboard() {
                   {/* Summary Metric Cards */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
                     <div className="glass" style={{ padding: "1.5rem", border: "1px solid rgba(184, 155, 114, 0.15)", borderRadius: "8px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Confirmed Revenue</span>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Room Bookings Revenue</span>
                       <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#b89b72", fontWeight: 600 }}>${metrics?.confirmedRevenue || 0}</p>
                     </div>
                     <div className="glass" style={{ padding: "1.5rem", border: "1px solid rgba(184, 155, 114, 0.15)", borderRadius: "8px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Occupancy Rate</span>
-                      <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#b89b72", fontWeight: 600 }}>{metrics?.occupancyRate || 0}%</p>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Room Service Revenue</span>
+                      <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#b89b72", fontWeight: 600 }}>
+                        ${restaurantOrders.reduce((sum, o) => sum + (o.status !== "CANCELLED" ? o.totalPrice : 0), 0)}
+                      </p>
                     </div>
                     <div className="glass" style={{ padding: "1.5rem", border: "1px solid rgba(184, 155, 114, 0.15)", borderRadius: "8px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Active PMS Staff</span>
-                      <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#b89b72", fontWeight: 600 }}>{metrics?.staffCount || 0}</p>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Wellness Spa Bookings</span>
+                      <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#b89b72", fontWeight: 600 }}>{spaBookings.length} bookings</p>
+                    </div>
+                    <div className="glass" style={{ padding: "1.5rem", border: "1px solid rgba(184, 155, 114, 0.15)", borderRadius: "8px" }}>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(245,240,225,0.5)", letterSpacing: "1px", textTransform: "uppercase" }}>Pending Concierge requests</span>
+                      <p style={{ margin: "5px 0 0 0", fontSize: "1.8rem", color: "#ffbaba", fontWeight: 600 }}>
+                        {conciergeRequests.filter(r => r.status === "PENDING").length} tickets
+                      </p>
                     </div>
                   </div>
 

@@ -369,5 +369,72 @@
       "pdfUrl": "/invoices/Aroohan_Invoice_BK-8724-X90A.pdf",
       "createdAt": "2026-06-08T18:01:37.018Z"
     }
+  ],
+  "users": [
+    {
+      "id": "USR-9081",
+      "email": "arjun@example.com",
+      "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "name": "Arjun Mehta",
+      "phone": "+91 98765 43210",
+      "loyaltyPoints": 350,
+      "vipStatus": "GOLD",
+      "preferences": [
+        "High floor",
+        "Vegan cuisine"
+      ],
+      "createdAt": "2026-06-08T18:20:31.629Z"
+    }
+  ],
+  "concierge_requests": [
+    {
+      "id": "CR-001",
+      "bookingId": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "roomNumber": "Cottage 101",
+      "requestType": "Towels",
+      "details": "Please bring 2 extra pool towels to Cottage 101.",
+      "status": "PENDING",
+      "createdAt": "2026-06-08T18:20:31.629Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "RV-001",
+      "bookingId": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "rating": 5,
+      "comment": "Absolutely magical stay. The views of the misty pine forests are breath-taking. The outdoor rainforest shower was a true highlight!",
+      "photos": [
+        "/images/gal-1.jpg",
+        "/images/gal-3.jpg"
+      ],
+      "isFeatured": true,
+      "isApproved": true,
+      "createdAt": "2026-06-08T18:20:31.629Z"
+    }
+  ],
+  "chats": [
+    {
+      "id": "CH-8724-X90A",
+      "bookingId": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "messages": [
+        {
+          "id": "m1",
+          "sender": "guest",
+          "message": "Hi, what time is the sunset yoga tomorrow?",
+          "timestamp": "2026-06-08T18:20:31.629Z"
+        },
+        {
+          "id": "m2",
+          "sender": "admin",
+          "message": "Namaste Arjun! The yoga session starts at 5:30 PM on the outdoor wooden deck.",
+          "timestamp": "2026-06-08T18:20:31.629Z"
+        }
+      ],
+      "status": "active",
+      "updatedAt": "2026-06-08T18:20:31.629Z"
+    }
   ]
 }
