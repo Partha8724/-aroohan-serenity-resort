@@ -1,16 +1,4 @@
-declare namespace JSX {
-  interface IntrinsicElements {
-    points: any;
-    bufferGeometry: any;
-    bufferAttribute: any;
-    pointsMaterial: any;
-    ambientLight: any;
-    directionalLight: any;
-    pointLight: any;
-    spotLight: any;
-    mesh: any;
-    group: any;
-    boxGeometry: any;
-    meshStandardMaterial: any;
-  }
-}
+// This file ensures @react-three/fiber JSX types are registered globally.
+// The R3F library already declares `JSX.IntrinsicElements extends ThreeElements`
+// in its own type definitions. We just need to reference it.
+/// <reference types="@react-three/fiber" />
