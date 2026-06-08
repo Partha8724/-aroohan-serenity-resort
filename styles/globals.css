@@ -1,0 +1,90 @@
+/* globals.css */
+:root {
+  --color-primary: #0b3d2e; /* deep forest green */
+  --color-secondary: #f5f0e1; /* soft cream */
+  --color-accent: #b89b72; /* matte gold */
+  --color-bg: #111111; /* dark background */
+  --color-surface: rgba(255, 255, 255, 0.08);
+  --font-family: 'Inter', sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-secondary);
+  overflow-x: hidden;
+}
+
+/* Glassmorphism utility */
+.glass {
+  backdrop-filter: blur(12px);
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Simple reset */
+* {
+  box-sizing: border-box;
+}
+
+/* Button styling */
+.button {
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--color-secondary);
+  font-weight: 600;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.button:hover {
+  transform: scale(1.05);
+  background: var(--color-accent);
+}
+
+/* Apple-style smooth scroll scroller locks */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Scroll progress indicator */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(to right, #b89b72, #f5f0e1, #b89b72);
+  background-size: 200% 100%;
+  animation: shimmer 4s infinite linear;
+  z-index: 100000;
+  pointer-events: none;
+  box-shadow: 0 1px 8px rgba(184, 155, 114, 0.6);
+  transition: width 0.08s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+

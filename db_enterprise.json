@@ -1,0 +1,373 @@
+{
+  "profiles": [
+    {
+      "id": "G-9081",
+      "name": "Arjun Mehta",
+      "email": "arjun@example.com",
+      "phone": "+91 98765 43210",
+      "identityDoc": "Passport: Z1234567",
+      "loyaltyPoints": 350,
+      "vipStatus": "GOLD",
+      "preferences": [
+        "High floor",
+        "Himalayan Cedar Oils",
+        "Vegan cuisine"
+      ]
+    },
+    {
+      "id": "G-7102",
+      "name": "Sarah Connor",
+      "email": "sarah.connor@example.com",
+      "phone": "+1 (555) 019-2831",
+      "identityDoc": "DL: TX-90210",
+      "loyaltyPoints": 120,
+      "vipStatus": "STANDARD",
+      "preferences": [
+        "Late checkout",
+        "Quiet room"
+      ]
+    }
+  ],
+  "housekeeping": [
+    {
+      "id": "HK-101",
+      "roomNumber": "101",
+      "cleanerName": "Ramesh Kumar",
+      "status": "COMPLETED",
+      "notes": "Cottage vacuumed, fresh cedar scents added.",
+      "assignedAt": "2026-06-08T17:46:06.772Z"
+    },
+    {
+      "id": "HK-102",
+      "roomNumber": "102",
+      "cleanerName": "Priya Sharma",
+      "status": "PENDING",
+      "notes": "Turn-down service, towels replacement.",
+      "assignedAt": "2026-06-08T17:46:06.772Z"
+    }
+  ],
+  "maintenance": [
+    {
+      "id": "MN-901",
+      "roomNumber": "103",
+      "issue": "Solar water heater pressure drop",
+      "priority": "HIGH",
+      "assignedStaff": "Amit Singh",
+      "status": "OPEN",
+      "createdAt": "2026-06-08T17:46:06.772Z"
+    }
+  ],
+  "restaurantOrders": [
+    {
+      "id": "FD-7011",
+      "bookingId": "BK-8724-X90A",
+      "tableNumber": "Room 101",
+      "isRoomService": true,
+      "items": [
+        {
+          "name": "Forest Mushroom Soup",
+          "qty": 2,
+          "price": 18
+        },
+        {
+          "name": "Organic Botanical Quinoa Salad",
+          "qty": 1,
+          "price": 22
+        }
+      ],
+      "totalPrice": 58,
+      "status": "PREPARING",
+      "createdAt": "2026-06-08T17:46:06.772Z"
+    }
+  ],
+  "spaBookings": [
+    {
+      "id": "SPA-3011",
+      "bookingId": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "therapyName": "Tibetan Sound Cleansing & Cedar Mud Wrap",
+      "scheduledAt": "2026-06-16T14:00:00Z",
+      "therapist": "Tenzin Gyatso",
+      "price": 150,
+      "status": "SCHEDULED"
+    }
+  ],
+  "transportBookings": [
+    {
+      "id": "TR-5011",
+      "bookingId": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "vehicleType": "SUV",
+      "pickupLocation": "Kangra Airport (DHM)",
+      "dropLocation": "Aroohan Resort Valleys",
+      "scheduledAt": "2026-06-15T09:30:00Z",
+      "driver": "Manish Dev",
+      "status": "SCHEDULED",
+      "price": 90
+    }
+  ],
+  "events": [
+    {
+      "id": "EV-1002",
+      "name": "Mehta Wedding Vows Renewal",
+      "type": "Wedding",
+      "startTime": "2026-06-17T17:00:00Z",
+      "endTime": "2026-06-17T23:00:00Z",
+      "budget": 8500,
+      "guestCount": 30,
+      "vendorTracking": [
+        {
+          "vendor": "Forest Florals Design",
+          "cost": 2500,
+          "paid": true
+        },
+        {
+          "vendor": "Vedic Fire Catering",
+          "cost": 4500,
+          "paid": false
+        }
+      ],
+      "status": "CONFIRMED"
+    }
+  ],
+  "channels": [
+    {
+      "channel": "Booking.com",
+      "lastSyncAt": "2026-06-08T17:46:06.772Z",
+      "status": "ACTIVE",
+      "syncedRooms": 3
+    },
+    {
+      "channel": "Airbnb",
+      "lastSyncAt": "2026-06-08T17:46:06.772Z",
+      "status": "ACTIVE",
+      "syncedRooms": 2
+    },
+    {
+      "channel": "Agoda",
+      "lastSyncAt": "2026-06-08T17:46:06.772Z",
+      "status": "ACTIVE",
+      "syncedRooms": 3
+    },
+    {
+      "channel": "Expedia",
+      "lastSyncAt": "2026-06-08T17:46:06.772Z",
+      "status": "ACTIVE",
+      "syncedRooms": 3
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room_1",
+      "name": "Luxury Serenity Cottage",
+      "desc": "A hand-crafted timber cottage with double-glazed panoramic windows overlooking the misty forest canopy.",
+      "fullDesc": "A hand-crafted timber cottage with double-glazed panoramic windows overlooking the misty forest canopy. Features a private cedarwood deck, custom wool elements, and an outdoor copper shower.",
+      "size": "45 sq m",
+      "maxGuests": 2,
+      "bedType": "King Size",
+      "amenities": [
+        "100% Certified Eco-Conscious Architecture",
+        "Private Outdoor Rainforest Copper Shower",
+        "On-Site Green Solar & Micro-Hydro Power Grid",
+        "Organic Bamboo Linens & Natural Thermal Bedding",
+        "Panoramic Visual Fields Overlooking Protected Wilds"
+      ],
+      "price": 350,
+      "images": [
+        "/images/my-room.jpg.jpg",
+        "/images/gal-1.jpg",
+        "/images/gal-3.jpg"
+      ],
+      "videoUrl": "/videos/my-video.mp4 (2).mp4",
+      "checkInTime": "02:00 PM",
+      "checkOutTime": "11:00 AM",
+      "cancellationPolicy": "Free cancellation up to 48 hours prior to arrival.",
+      "availableCount": 3
+    },
+    {
+      "id": "room_2",
+      "name": "Ocean Vista Villa",
+      "desc": "A floating ocean-front sanctuary built on copper pilings. Floor-to-ceiling glass doors open directly to a private deep-water infinity plunge pool.",
+      "fullDesc": "A floating ocean-front sanctuary built on copper pilings. Floor-to-ceiling glass doors open directly to a private deep-water infinity plunge pool and marine reef steps. Experience luxury on the water.",
+      "size": "60 sq m",
+      "maxGuests": 3,
+      "bedType": "King Size + Daybed",
+      "amenities": [
+        "Floating Ocean-Front Architecture",
+        "Private Deep-Water Infinity Plunge Pool",
+        "Floor-to-Ceiling Glass Doors",
+        "Marine Reef Access Steps",
+        "Eco-Conscious Cooling & Filtration"
+      ],
+      "price": 550,
+      "images": [
+        "/images/gal-2.jpg",
+        "/images/gal-4.jpg",
+        "/images/gal-1.jpg"
+      ],
+      "videoUrl": "/videos/my-video.mp4.mp4",
+      "checkInTime": "02:00 PM",
+      "checkOutTime": "11:00 AM",
+      "cancellationPolicy": "Free cancellation up to 72 hours prior to arrival.",
+      "availableCount": 2
+    },
+    {
+      "id": "room_3",
+      "name": "Forest Canopy Retreat",
+      "desc": "Elevated treehouse architecture constructed from native bamboo and light pine. Features an organic skylight for night stargazing.",
+      "fullDesc": "Elevated treehouse architecture constructed from native bamboo and light pine. Features an organic skylight for night stargazing, suspended hammocks, and custom solar energy generation panels.",
+      "size": "55 sq m",
+      "maxGuests": 4,
+      "bedType": "Two Double Beds",
+      "amenities": [
+        "Elevated Treehouse Construction",
+        "Organic Skylight for Night Stargazing",
+        "Suspended Forest Canopy Hammocks",
+        "Native Bamboo & Light Pine Elements",
+        "Private Cedar Balcony with Valley View"
+      ],
+      "price": 450,
+      "images": [
+        "/images/my-room.jpg (2).jpg",
+        "/images/gal-3.jpg",
+        "/images/gal-4.jpg"
+      ],
+      "videoUrl": "/videos/my-video.mp4 (3).mp4",
+      "checkInTime": "02:00 PM",
+      "checkOutTime": "11:00 AM",
+      "cancellationPolicy": "Free cancellation up to 48 hours prior to arrival.",
+      "availableCount": 4
+    }
+  ],
+  "coupons": [
+    {
+      "id": "cp_1",
+      "code": "WELCOME20",
+      "discountPercentage": 20,
+      "validFrom": "2026-01-01",
+      "validTo": "2027-12-31",
+      "isActive": true
+    },
+    {
+      "id": "cp_2",
+      "code": "SERENITY10",
+      "discountPercentage": 10,
+      "validFrom": "2026-01-01",
+      "validTo": "2027-12-31",
+      "isActive": true
+    }
+  ],
+  "guests": [
+    {
+      "id": "G-9081",
+      "name": "Arjun Mehta",
+      "email": "arjun@example.com",
+      "phone": "+91 98765 43210",
+      "identityDoc": "Passport: Z1234567",
+      "loyaltyPoints": 350,
+      "vipStatus": "GOLD",
+      "preferences": [
+        "High floor",
+        "Himalayan Cedar Oils",
+        "Vegan cuisine"
+      ]
+    },
+    {
+      "id": "G-7102",
+      "name": "Sarah Connor",
+      "email": "sarah.connor@example.com",
+      "phone": "+1 (555) 019-2831",
+      "identityDoc": "DL: TX-90210",
+      "loyaltyPoints": 120,
+      "vipStatus": "STANDARD",
+      "preferences": [
+        "Late checkout",
+        "Quiet room"
+      ]
+    }
+  ],
+  "room_images": [
+    {
+      "id": "img_1",
+      "roomId": "room_1",
+      "url": "/images/my-room.jpg.jpg"
+    },
+    {
+      "id": "img_2",
+      "roomId": "room_1",
+      "url": "/images/gal-1.jpg"
+    },
+    {
+      "id": "img_3",
+      "roomId": "room_1",
+      "url": "/images/gal-3.jpg"
+    },
+    {
+      "id": "img_4",
+      "roomId": "room_2",
+      "url": "/images/gal-2.jpg"
+    },
+    {
+      "id": "img_5",
+      "roomId": "room_2",
+      "url": "/images/gal-4.jpg"
+    },
+    {
+      "id": "img_6",
+      "roomId": "room_2",
+      "url": "/images/gal-1.jpg"
+    },
+    {
+      "id": "img_7",
+      "roomId": "room_3",
+      "url": "/images/my-room.jpg (2).jpg"
+    },
+    {
+      "id": "img_8",
+      "roomId": "room_3",
+      "url": "/images/gal-3.jpg"
+    },
+    {
+      "id": "img_9",
+      "roomId": "room_3",
+      "url": "/images/gal-4.jpg"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK-8724-X90A",
+      "guestName": "Arjun Mehta",
+      "guestEmail": "arjun@example.com",
+      "guestPhone": "+91 98765 43210",
+      "guestIdentity": "Passport: Z1234567",
+      "roomType": "Luxury Serenity Cottage",
+      "checkIn": "2026-06-15",
+      "checkOut": "2026-06-18",
+      "guests": 2,
+      "totalPrice": 1050,
+      "status": "CONFIRMED",
+      "createdAt": "2026-06-08T18:01:37.017Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "PAY-8724-X90A",
+      "bookingId": "BK-8724-X90A",
+      "amount": 1050,
+      "gateway": "Razorpay",
+      "gatewayTransactionId": "pay_test_ArjunTransaction1",
+      "status": "PAID",
+      "createdAt": "2026-06-08T18:01:37.018Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "INV-8724-X90A",
+      "invoiceNumber": "INV-8724-X90A",
+      "bookingId": "BK-8724-X90A",
+      "paymentId": "PAY-8724-X90A",
+      "pdfUrl": "/invoices/Aroohan_Invoice_BK-8724-X90A.pdf",
+      "createdAt": "2026-06-08T18:01:37.018Z"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "BK-8724-X90A",
+    "guestName": "Arjun Mehta",
+    "guestEmail": "arjun@example.com",
+    "guestPhone": "+91 98765 43210",
+    "guestIdentity": "Passport: Z1234567",
+    "roomType": "Luxury Serenity Cottage",
+    "checkIn": "2026-06-15",
+    "checkOut": "2026-06-18",
+    "guests": 2,
+    "totalPrice": 1050,
+    "status": "CONFIRMED",
+    "createdAt": "2026-06-08T17:30:05.343Z"
+  },
+  {
+    "id": "BK-8724-Y71B",
+    "guestName": "Sarah Connor",
+    "guestEmail": "sarah.connor@example.com",
+    "guestPhone": "+1 (555) 019-2831",
+    "guestIdentity": "DL: TX-90210",
+    "roomType": "Ocean Vista Villa",
+    "checkIn": "2026-07-01",
+    "checkOut": "2026-07-06",
+    "guests": 3,
+    "totalPrice": 2750,
+    "status": "CONFIRMED",
+    "createdAt": "2026-06-08T17:30:05.344Z"
+  }
+]

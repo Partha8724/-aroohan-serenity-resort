@@ -1,0 +1,9 @@
+# Robots.txt for Aroohan Serenity Resort
+# Location: C:\Users\HP\Desktop\aroohan-serenity-resort\public\robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://aroohanserenityresort.com/sitemap.xml
