@@ -820,10 +820,10 @@ export default function AdminDashboard() {
           </div>
         ) : (
           /* Multi-Tab Enterprise Operations Panel */
-          <div style={{ width: "100%", maxWidth: "1250px", display: "grid", gridTemplateColumns: "250px 1fr", gap: "3rem" }}>
+          <div className="responsive-admin-grid" style={{ width: "100%", maxWidth: "1250px", display: "grid", gridTemplateColumns: "250px 1fr", gap: "3rem" }}>
             
             {/* Sidebar Navigation */}
-            <aside style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+            <aside className="responsive-admin-sidebar" style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
               <div style={{ padding: "0 1rem 1.5rem 1rem", borderBottom: "1px solid rgba(245,240,225,0.08)", marginBottom: "1rem" }}>
                 <span style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "3px", textTransform: "uppercase", fontWeight: 600 }}>Enterprise PMS</span>
                 <h3 style={{ fontSize: "1.4rem", fontWeight: 300, margin: "5px 0 0 0", color: "#f5f0e1" }}>Aroohan</h3>

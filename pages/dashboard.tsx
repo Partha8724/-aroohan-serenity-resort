@@ -1305,7 +1305,7 @@ export default function CustomerDashboard() {
               )}
 
               {/* Workspace Navigation tab lists */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              <div className="responsive-dashboard-tabs" style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 {[
                   { key: "stays", label: t("stays"), icon: "🛏️" },
                   { key: "dining", label: t("roomService"), icon: "🍽️" },

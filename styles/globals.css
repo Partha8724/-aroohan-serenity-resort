@@ -88,3 +88,133 @@ html.lenis {
   100% { background-position: -200% 0; }
 }
 
+/* Responsive Overrides & Layout Adaptation */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.5rem;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 155, 114, 0.3);
+  border-radius: 4px;
+}
+
+/* Fluid spacing and layout adaptions for mobile viewports */
+@media (max-width: 992px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  /* Admin Sidebar Scrollable */
+  .responsive-admin-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+  .responsive-admin-sidebar {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid rgba(245, 240, 225, 0.08) !important;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .responsive-admin-sidebar button {
+    flex: 0 0 auto !important;
+    padding: 0.6rem 1rem !important;
+  }
+  .responsive-admin-grid .glass {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+@media (max-width: 850px) {
+  /* 3D Room Explorer details panel */
+  .portfolio-card {
+    grid-template-columns: 1fr !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+  .media-window {
+    min-height: 250px !important;
+    height: 250px !important;
+  }
+  .details-sheet {
+    padding: 1.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Dashboard layout */
+  .responsive-dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .responsive-dashboard-tabs {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 6px !important;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid rgba(245, 240, 225, 0.05) !important;
+  }
+  .responsive-dashboard-tabs button {
+    flex: 0 0 auto !important;
+    padding: 0.6rem 1rem !important;
+  }
+  .responsive-checkin-grid,
+  .responsive-wellness-grid,
+  .responsive-profile-fields {
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem !important;
+  }
+  .responsive-dashboard-grid .glass {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* General padding & margin optimizations */
+  section {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Booking Widget full width controls */
+  .booking-widget-main {
+    padding: 1.2rem !important;
+    gap: 1rem !important;
+  }
+  .booking-widget-btn-wrapper {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+  .booking-widget-btn-wrapper button {
+    width: 100% !important;
+  }
+
+  /* Booking Wizard Dialog */
+  .wizard-grid-2col, 
+  .wizard-grid-3col {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .wizard-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+  }
+  .room-specs-grid,
+  .room-policy-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+  }
+}

@@ -18,7 +18,7 @@ export const BookingWidget: React.FC<BookingWidgetProps> = ({ onCheckAvailabilit
 
   return (
     <div
-      className="glass"
+      className="glass booking-widget-main"
       style={{
         width: "100%",
         maxWidth: "1000px",
@@ -122,7 +122,7 @@ export const BookingWidget: React.FC<BookingWidgetProps> = ({ onCheckAvailabilit
         </select>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div className="booking-widget-btn-wrapper" style={{ display: "flex", justifyContent: "flex-end" }}>
         <MagneticButton data-cursor="Check" onClick={handleCheck}>
           <button
             className="button"

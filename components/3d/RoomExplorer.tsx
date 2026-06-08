@@ -365,14 +365,14 @@ const RoomDetailsModal: React.FC<TourProps> = ({ room, onClose, onBookNow }) => 
             </p>
 
             {/* Quick Specs Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.8rem", margin: "1rem 0", padding: "0.8rem 0", borderTop: "1px solid rgba(245,240,225,0.1)", borderBottom: "1px solid rgba(245,240,225,0.1)", fontSize: "0.75rem", color: "rgba(245,240,225,0.7)" }}>
+            <div className="room-specs-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.8rem", margin: "1rem 0", padding: "0.8rem 0", borderTop: "1px solid rgba(245,240,225,0.1)", borderBottom: "1px solid rgba(245,240,225,0.1)", fontSize: "0.75rem", color: "rgba(245,240,225,0.7)" }}>
               <div><strong>Size:</strong> {room.size || "45 sq m"}</div>
               <div><strong>Bed:</strong> {room.bedType || "King Size"}</div>
               <div><strong>Guests:</strong> Max {room.maxGuests || 2}</div>
             </div>
 
             {/* Guidelines */}
-            <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "1rem", fontSize: "0.75rem", color: "rgba(245,240,225,0.6)", marginBottom: "1rem" }}>
+            <div className="room-policy-grid" style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "1rem", fontSize: "0.75rem", color: "rgba(245,240,225,0.6)", marginBottom: "1rem" }}>
               <div>
                 <div><strong>Check-In:</strong> {room.checkInTime || "02:00 PM"}</div>
                 <div><strong>Check-Out:</strong> {room.checkOutTime || "11:00 AM"}</div>

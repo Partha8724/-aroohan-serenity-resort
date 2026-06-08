@@ -423,7 +423,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     >
       <div
         ref={contentRef}
-        className="glass"
+        className="glass wizard-modal-content"
         style={{
           width: "100%",
           maxWidth: "720px",
@@ -463,7 +463,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
           <div>
             <h2 style={{ fontSize: "1.8rem", fontWeight: 300, marginBottom: "1.5rem" }}> Cradled in Nature</h2>
             
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Check In</label>
                 <input
@@ -484,7 +484,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Cottage Selection</label>
                 <select
@@ -499,7 +499,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                   ))}
                 </select>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Adults</label>
                   <select
@@ -542,7 +542,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
             </div>
 
             {/* Coupon Code Panel */}
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", alignItems: "flex-end" }}>
+            <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1rem", marginBottom: "2rem", alignItems: "flex-end" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1.5 }}>
                 <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Coupon Code</label>
                 <input
@@ -605,7 +605,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+              <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                   <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Email Address</label>
                   <input
@@ -628,7 +628,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: "1.5rem" }}>
+              <div className="wizard-grid-2col" style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: "1.5rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                   <label style={{ fontSize: "0.65rem", color: "#b89b72", letterSpacing: "1px", textTransform: "uppercase" }}>Address (City/State)</label>
                   <input
