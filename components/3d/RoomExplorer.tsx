@@ -533,8 +533,11 @@ export const RoomExplorer = ({ onBookNow }: { onBookNow?: (roomType: string) => 
       )}
 
       {/* 3D Canvas Selector */}
-      <div style={{ height: "600px", width: "100%", position: "relative" }}>
-        <Canvas camera={{ position: [0, 0, 5], fov: 55 }}>
+      <div className="room-explorer-canvas-container" style={{ height: "600px", width: "100%", position: "relative" }}>
+        <Canvas 
+          camera={{ position: [0, 0, 5], fov: 55 }}
+          dpr={typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 2]}
+        >
           <ambientLight intensity={0.4} />
           <directionalLight position={[5, 5, 5]} intensity={1} color="#f5f0e1" />
           <pointLight position={[-5, 5, -5]} intensity={0.5} color="#b89b72" />

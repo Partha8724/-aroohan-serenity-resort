@@ -11,6 +11,14 @@ export const CustomCursor = () => {
     const ring = ringRef.current;
     if (!cursor || !ring) return;
 
+    // Disable custom cursor on touch devices
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) {
+      cursor.style.display = "none";
+      ring.style.display = "none";
+      return;
+    }
+
     // Set initial offscreen
     gsap.set([cursor, ring], { xPercent: -50, yPercent: -50 });
 

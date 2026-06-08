@@ -4,18 +4,31 @@ import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 
+import { useMemo } from "react";
+
 // Particles floating gracefully in the background over the video
 const AmbientParticles = () => {
-  const count = 150;
+  const [count, setCount] = useState(150);
   const meshRef = useRef<THREE.Points>(null);
-
-  const particlesPosition = useRef(new Float32Array(count * 3));
+  const geomRef = useRef<THREE.BufferGeometry>(null);
 
   useEffect(() => {
-    for (let i = 0; i < count; i++) {
-      particlesPosition.current[i * 3] = (Math.random() - 0.5) * 10;
-      particlesPosition.current[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      particlesPosition.current[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    const isMobile = window.innerWidth < 768;
+    const finalCount = isMobile ? 50 : 150;
+    setCount(finalCount);
+
+    const positions = new Float32Array(finalCount * 3);
+    for (let i = 0; i < finalCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    }
+    
+    if (geomRef.current) {
+      geomRef.current.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3)
+      );
     }
   }, []);
 
@@ -29,12 +42,7 @@ const AmbientParticles = () => {
 
   return (
     <points ref={meshRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[particlesPosition.current, 3]}
-        />
-      </bufferGeometry>
+      <bufferGeometry ref={geomRef} />
       <pointsMaterial
         size={0.05}
         color="#b89b72"
@@ -57,7 +65,10 @@ export const HeroScene = () => {
 
   return (
     <div style={{ height: "100%", width: "100%", position: "absolute", top: 0, left: 0, zIndex: 0, pointerEvents: "none" }}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 5], fov: 45 }}
+        dpr={typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 2]}
+      >
         <ambientLight intensity={0.2} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} color="#f5f0e1" />
         <pointLight position={[-5, -5, -5]} intensity={0.5} color="#b89b72" />

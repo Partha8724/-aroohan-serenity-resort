@@ -111,6 +111,10 @@ html.lenis {
     display: none !important;
   }
   
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
   /* Admin Sidebar Scrollable */
   .responsive-admin-grid {
     grid-template-columns: 1fr !important;
@@ -152,8 +156,13 @@ html.lenis {
 }
 
 @media (max-width: 768px) {
-  /* Dashboard layout */
-  .responsive-dashboard-grid {
+  /* Dashboard and Admin layout grids stacking */
+  .responsive-dashboard-grid,
+  .responsive-auth-grid,
+  .responsive-dining-grid,
+  .responsive-concierge-grid,
+  .responsive-reviews-grid,
+  .responsive-chat-grid {
     grid-template-columns: 1fr !important;
     gap: 1.5rem !important;
   }
@@ -176,15 +185,72 @@ html.lenis {
     grid-template-columns: 1fr !important;
     gap: 1.2rem !important;
   }
+  .responsive-perks-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
   .responsive-dashboard-grid .glass {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Reduce overlay wrapper padding on mobile to save horizontal space */
+  .modal-overlay,
+  div[style*="position: fixed"][style*="zIndex: 10002"],
+  div[style*="position: fixed"][style*="zIndex: 9999"] {
+    padding: 0.5rem !important;
   }
   
   /* General padding & margin optimizations */
   section {
     padding-top: 4rem !important;
     padding-bottom: 4rem !important;
+  }
+  
+  /* Touch target sizes and room canvas height for mobile comfort */
+  .room-explorer-canvas-container {
+    height: 380px !important;
+  }
+  
+  button,
+  .button,
+  a.button,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    min-height: 44px !important;
+  }
+  
+  /* Form fields stretch to full width on mobile viewports */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100% !important;
+  }
+
+  /* Inline flex inputs should not stretch to full width */
+  form[style*="display: flex"] input[type="text"],
+  div[style*="display: flex"] input[type="text"],
+  form[style*="display: flex"] input[type="email"],
+  div[style*="display: flex"] input[type="email"] {
+    width: auto !important;
+  }
+  
+  /* Touch friendly checkbox sizes */
+  input[type="checkbox"] {
+    min-width: 24px !important;
+    min-height: 24px !important;
+    cursor: pointer;
+    margin: 8px !important;
+    width: auto !important;
   }
 }
 
@@ -217,4 +283,69 @@ html.lenis {
     grid-template-columns: 1fr !important;
     gap: 0.8rem !important;
   }
+  
+  /* Reduce booking wizard and modal paddings on phones */
+  .wizard-modal-content, .modal-content {
+    padding: 1.5rem 1rem !important;
+    border-radius: 16px !important;
+  }
+  
+  /* Wizard billing summary adjustment */
+  .wizard-modal-content div[style*="rgba(184, 155, 114, 0.06)"] {
+    padding: 1rem !important;
+    font-size: 0.78rem !important;
+  }
+  
+  /* Force all auto-fit minmax grids to stack on extra narrow screens */
+  div[style*="grid-template-columns"][style*="minmax"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Scale headings on small mobile viewports */
+  h1 {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  h2 {
+    font-size: clamp(1.4rem, 6vw, 1.8rem) !important;
+  }
+  h3 {
+    font-size: clamp(1.1rem, 5vw, 1.4rem) !important;
+  }
+  
+  /* Scale images to aspect-ratio inside cards */
+  .zoom-in-bg {
+    aspect-ratio: 16 / 9;
+    height: auto !important;
+  }
 }
+
+@media (max-width: 480px) {
+  section, footer, main {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  header {
+    width: 95% !important;
+    padding: 0.6rem 0.8rem !important;
+    top: 10px !important;
+  }
+}
+
+/* Custom scrollbars for scrollable glass containers */
+.glass::-webkit-scrollbar {
+  height: 6px;
+}
+.glass::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 155, 114, 0.3);
+  border-radius: 4px;
+}
+
+/* Fluid Media Adaptations */
+img, video {
+  max-width: 100%;
+}
+body, main {
+  overflow-x: hidden !important;
+}
+
