@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { readDatabase } from "../../lib/db";
-import { sendNotification } from "../../lib/enterprise";
+import { readDatabase } from "../../../lib/db";
+import { sendNotification } from "../../../lib/enterprise";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
